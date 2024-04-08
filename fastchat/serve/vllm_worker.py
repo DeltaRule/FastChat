@@ -23,7 +23,7 @@ from fastchat.serve.model_worker import (
     worker_id,
 )
 from fastchat.utils import get_context_length, is_partial_stop
-
+import os
 
 app = FastAPI()
 
@@ -278,7 +278,13 @@ if __name__ == "__main__":
         "throughput. However, if the value is too high, it may cause out-of-"
         "memory (OOM) errors.",
     )
-
+    parser.add_argument(
+        "--ssl",
+        action="store_true",
+        required=False,
+        default=False,
+        help="Enable SSL. Requires OS Environment variables 'SSL_KEYFILE' and 'SSL_CERTFILE'.",
+    )
     parser = AsyncEngineArgs.add_cli_args(parser)
     args = parser.parse_args()
     if args.model_path:
@@ -299,4 +305,14 @@ if __name__ == "__main__":
         engine,
         args.conv_template,
     )
-    uvicorn.run(app, host=args.host, port=args.port, log_level="info")
+    if(args.ssl):
+        uvicorn.run(
+            app,
+            host=args.host,
+            port=args.port,
+            log_level="info",
+            ssl_keyfile=os.environ["SSL_KEYFILE"],
+            ssl_certfile=os.environ["SSL_CERTFILE"],
+        )
+    else:
+        uvicorn.run(app, host=args.host, port=args.port, log_level="info")
