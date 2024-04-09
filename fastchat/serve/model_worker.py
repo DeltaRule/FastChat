@@ -61,6 +61,7 @@ class ModelWorker(BaseModelWorker):
         embed_in_truncate: bool = False,
         seed: Optional[int] = None,
         debug: bool = False,
+        context_len:Optional[int] = None,
         **kwargs,
     ):
         super().__init__(
@@ -92,7 +93,10 @@ class ModelWorker(BaseModelWorker):
         self.device = device
         if self.tokenizer.pad_token == None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
-        self.context_len = get_context_length(self.model.config, self.tokenizer.model_max_length)
+        if(context_len != None):
+            self.context_len = context_len
+        else:
+            self.context_len = get_context_length(self.model.config)
         self.generate_stream_func = get_generate_stream_function(self.model, model_path)
         self.stream_interval = stream_interval
         self.embed_in_truncate = embed_in_truncate
@@ -342,6 +346,13 @@ def create_model_worker():
         default=False,
         help="Enable SSL. Requires OS Environment variables 'SSL_KEYFILE' and 'SSL_CERTFILE'.",
     )
+    parser.add_argument(
+        "--context-len",
+        required=False,
+        default=None,
+        type=None,
+        help="The length of the context (The number of tokens that can be processed), if not passed it it will be determined automatically",
+    )
     args = parser.parse_args()
     logger.info(f"args: {args}")
 
@@ -406,6 +417,7 @@ def create_model_worker():
         embed_in_truncate=args.embed_in_truncate,
         seed=args.seed,
         debug=args.debug,
+        context_len=args.context_len
     )
     return args, worker
 

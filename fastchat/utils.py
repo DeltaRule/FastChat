@@ -329,7 +329,7 @@ SEQUENCE_LENGTH_KEYS = [
 ]
 
 
-def get_context_length(config, tokenizer_model_max_length=1e12):
+def get_context_length(config):
     """Get the context length of a model from a huggingface model config."""
     rope_scaling = getattr(config, "rope_scaling", None)
     if rope_scaling:
@@ -340,7 +340,7 @@ def get_context_length(config, tokenizer_model_max_length=1e12):
     for key in SEQUENCE_LENGTH_KEYS:
         val = getattr(config, key, None)
         if val is not None:
-            return int(rope_scaling_factor * min(val, tokenizer_model_max_length))
+            return int(rope_scaling_factor * val)
     return 2048
 
 
