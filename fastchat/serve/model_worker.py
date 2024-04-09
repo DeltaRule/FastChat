@@ -92,7 +92,7 @@ class ModelWorker(BaseModelWorker):
         self.device = device
         if self.tokenizer.pad_token == None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
-        self.context_len = get_context_length(self.model.config)
+        self.context_len = get_context_length(self.model.config, self.tokenizer.model_max_length)
         self.generate_stream_func = get_generate_stream_function(self.model, model_path)
         self.stream_interval = stream_interval
         self.embed_in_truncate = embed_in_truncate
