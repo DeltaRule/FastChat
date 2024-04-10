@@ -350,7 +350,7 @@ def create_model_worker():
         "--context-len",
         required=False,
         default=None,
-        type=None,
+        type=int,
         help="The length of the context (The number of tokens that can be processed), if not passed it it will be determined automatically",
     )
     args = parser.parse_args()
