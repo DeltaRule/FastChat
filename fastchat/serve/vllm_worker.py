@@ -16,6 +16,7 @@ from vllm import AsyncLLMEngine
 from vllm.engine.arg_utils import AsyncEngineArgs
 from vllm.sampling_params import SamplingParams
 from vllm.utils import random_uuid
+from typing import List, Optional
 
 from fastchat.serve.base_model_worker import BaseModelWorker
 from fastchat.serve.model_worker import (
@@ -40,6 +41,7 @@ class VLLMWorker(BaseModelWorker):
         no_register: bool,
         llm_engine: AsyncLLMEngine,
         conv_template: str,
+        context_len:Optional[int] = None,
     ):
         super().__init__(
             controller_addr,
@@ -59,7 +61,10 @@ class VLLMWorker(BaseModelWorker):
         # and llm_engine.engine.tokenizer was no longer a raw tokenizer
         if hasattr(self.tokenizer, "tokenizer"):
             self.tokenizer = llm_engine.engine.tokenizer.tokenizer
-        self.context_len = get_context_length(llm_engine.engine.model_config.hf_config)
+        if(context_len == None):
+            self.context_len = get_context_length(llm_engine.engine.model_config.hf_config)
+        else:
+            self.context_len = context_len
 
         if not no_register:
             self.init_heart_beat()
@@ -304,6 +309,7 @@ if __name__ == "__main__":
         args.no_register,
         engine,
         args.conv_template,
+        engine_args.max_model_len
     )
     if(args.ssl):
         uvicorn.run(
