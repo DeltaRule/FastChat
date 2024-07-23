@@ -299,6 +299,7 @@ if __name__ == "__main__":
 
     engine_args = AsyncEngineArgs.from_cli_args(args)
     engine = AsyncLLMEngine.from_engine_args(engine_args)
+    print(engine_args.max_model_len)
     worker = VLLMWorker(
         args.controller_address,
         args.worker_address,
