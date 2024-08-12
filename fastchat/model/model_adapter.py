@@ -104,7 +104,7 @@ class BaseModelAdapter:
                 trust_remote_code=True,
                 **from_pretrained_kwargs,
             )
-        except NameError:
+        except ValueError:
             model = AutoModel.from_pretrained(
                 model_path,
                 low_cpu_mem_usage=True,
